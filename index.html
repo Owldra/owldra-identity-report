@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owldra Weekly Digital Identity Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #2d3748;
+        }
+        
+        .report-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .header .date {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .header .user-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        
+        .header .summary-line {
+            font-size: 15px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            font-size: 22px;
+            color: #1e88e5;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: #1e88e5;
+            border-radius: 2px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        
+        .stat-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .stat-change.up {
+            color: #e53e3e;
+        }
+        
+        .stat-change.down {
+            color: #38a169;
+        }
+        
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .risk-critical {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .risk-high {
+            background: #feebc8;
+            color: #c05621;
+        }
+        
+        .risk-moderate {
+            background: #fefcbf;
+            color: #975a16;
+        }
+        
+        .risk-low {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .exposure-score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 16px;
+        }
+        
+        .exposure-score .score {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .exposure-score .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .ai-summary {
+            background: #edf2f7;
+            border-left: 4px solid #1e88e5;
+            padding: 16px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+        
+        .findings-list {
+            list-style: none;
+        }
+        
+        .finding-item {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+        
+        .finding-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .icon-reddit { background: #ff4500; color: white; }
+        .icon-medium { background: #000; color: white; }
+        .icon-twitter { background: #1da1f2; color: white; }
+        .icon-pinterest { background: #e60023; color: white; }
+        .icon-instagram { background: #e4405f; color: white; }
+        .icon-broker { background: #718096; color: white; }
+        .icon-breach { background: #e53e3e; color: white; }
+        
+        .finding-content {
+            flex: 1;
+        }
+        
+        .finding-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        
+        .finding-description {
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.5;
+        }
+        
+        .alert-box {
+            background: #fff5f5;
+            border: 2px solid #fc8181;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .alert-box strong {
+            color: #c53030;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .recommendation-box {
+            background: #ebf8ff;
+            border: 2px solid #63b3ed;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .recommendation-box strong {
+            color: #2c5282;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin-top: 20px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #1e88e5;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #1e88e5;
+        }
+        
+        .timeline-day {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        
+        .timeline-event {
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        .risk-chart {
+            margin-top: 20px;
+        }
+        
+        .risk-bar {
+            margin-bottom: 16px;
+        }
+        
+        .risk-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+        
+        .risk-bar-track {
+            height: 24px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .risk-bar-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 1s ease-out;
+        }
+        
+        .bar-high { background: linear-gradient(90deg, #fc8181, #e53e3e); }
+        .bar-moderate { background: linear-gradient(90deg, #f6ad55, #ed8936); }
+        .bar-low { background: linear-gradient(90deg, #68d391, #38a169); }
+        
+        .action-list {
+            list-style: none;
+        }
+        
+        .action-item {
+            padding: 12px 16px;
+            background: #f7fafc;
+            border-left: 4px solid #1e88e5;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            font-size: 15px;
+            color: #2d3748;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
+        }
+        
+        .footer {
+            background: #f7fafc;
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-cta {
+            margin-bottom: 20px;
+        }
+        
+        .footer-text {
+            font-size: 13px;
+            color: #718096;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Weekly Digital Identity Report</h1>
+            <div class="date">October 24, 2025</div>
+            <div class="user-name">Report for Jane Doe</div>
+            <div class="summary-line">Owldra has completed your latest digital scan. Here's what we found about your online identity this week.</div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Summary Snapshot -->
+            <div class="section">
+                <h2>Summary Snapshot</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Public Mentions</div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-change up">↑ +5 from last week</div>
+                        <span class="risk-badge risk-moderate">Moderate</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Data Broker Listings</div>
+                        <div class="stat-value">3</div>
+                        <div class="stat-change down">↓ -2 from last week</div>
+                        <span class="risk-badge risk-low">Low</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Face Matches</div>
+                        <div class="stat-value">2</div>
+                        <div class="stat-change up">↑ +2 from last week</div>
+                        <span class="risk-badge risk-high">High</span>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Breach Hits</div>
+                        <div class="stat-value">1</div>
+                        <div class="stat-change up">↑ +1 from last week</div>
+                        <span class="risk-badge risk-critical">Critical</span>
+                    </div>
+                </div>
+                <div class="exposure-score">
+                    <div class="score">62 / 100</div>
+                    <div class="label">Total Exposure Score (+8 from last week) — Needs Attention</div>
+                </div>
+                <div class="ai-summary">
+                    <strong>🦉 Owlex AI Summary:</strong> Your name and photos have appeared more frequently on social platforms this week, and one new data broker listing was detected. We also identified a recent data breach that includes your email address.
+                </div>
+            </div>
+
+            <!-- Public Mentions -->
+            <div class="section">
+                <h2>Public Mentions Detected</h2>
+                <ul class="findings-list">
+                    <li class="finding-item">
+                        <div class="finding-icon icon-reddit">R</div>
+                        <div class="finding-content">
+                            <div class="finding-title">Reddit Discussion</div>
+                            <div class="finding-description">u/JaneDoe89 mentioned in r/Design community post "Local Designers to Follow" with 247 upvotes</div>
+                        </div>
+                    </li>
+                    <li class="finding-item">
+                        <div class="finding-icon icon-medium">M</div>
+                        <div class="finding-content">
+                            <div class="finding-title">Medium Article</div>
+                            <div class="finding-description">"10 Emerging Creatives Reshaping Digital Art" — Article cites your full name and includes your LinkedIn profile photo</div>
+                        </div>
+                    </li>
+                    <li class="finding-item">
+                        <div class="finding-icon icon-twitter">𝕏</div>
+                        <div class="finding-content">
+                            <div class="finding-title">X (Twitter) Mention</div>
+                            <div class="finding-description">Quote retweet of your project announcement from @DesignWeekly (12.3K followers) — reached 8,400 impressions</div>
+                        </div>
+                    </li>
+                    <li class="finding-item">
+                        <div class="finding-icon icon-medium">📰</div>
+                        <div class="finding-content">
+                            <div class="finding-title">Blog Feature</div>
+                            <div class="finding-description">Creative industry blog featured your portfolio work with attribution and contact information</div>
+                        </div>
+                    </li>
+                </ul>
+                <a href="#" class="cta-button">→ Review All Mentions</a>
+            </div>
+
+            <!-- Data Broker Alerts -->
+            <div class="section">
+                <h2>Data Broker Alerts</h2>
+                <ul class="findings-list">
+                    <li class="finding-item">
+                        <div class="finding-icon icon-broker">🔍</div>
+                        <div class="finding-content">
+                            <div class="finding-title">Spokeo.com</div>
+                            <div class="finding-description">Listing includes: Partial address (city/state), phone number, age range, possible relatives</div>
+                        </div>
+                    </li>
+                    <li class="finding-item">
+                        <div class="finding-icon icon-broker">🔍</div>
+                        <div class="finding-content">
+                            <div class="finding-title">TruthFinder.com</div>
+                            <div class="finding-description">Full background report available for purchase — includes previous addresses, phone numbers, email addresses</div>
+                        </div>
+                    </li>
+                    <li class="finding-item">
+                        <div class="finding-icon icon-broker">🔍</div>
+                        <div class="finding-content">
+                            <div class="finding-title">Whitepages.com</div>
+                            <div class="finding-description">Old address record from 2019 still visible in public directory</div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="recommendation-box">
+                    <strong>🦉 Owldra Suggestion:</strong> Consider removing outdated or redundant listings. These data broker records can be used for identity theft, phishing, or unwanted contact. Owldra can automate the removal process across multiple brokers simultaneously.
+                </div>
+                <a href="#" class="cta-button">→ Start Removal Request</a>
+            </div>
+
+            <!-- Face Recognition Findings -->
+            <div class="section">
+                <h2>Face Recognition Findings</h2>
+                <ul class="findings-list">
+                    <li class="finding-item">
+                        <div class="finding-icon icon-pinterest">P</div>
+                        <div class="finding-content">
+                            <div class="finding-title">Pinterest Board Match</div>
+                            <div class="finding-description">Your image appears in "Design Inspiration – Professional Portraits" board (2,341 saves) — posted by user @CreativeCollector without attribution</div>
+                        </div>
+                    </li>
+                    <li class="finding-item">
+                        <div class="finding-icon icon-instagram">IG</div>
+                        <div class="finding-content">
+                            <div class="finding-title">Instagram Tag Match</div>
+                            <div class="finding-description">Tagged in public event photo from @TechConference2025 — visible to 45K followers, includes location data</div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="alert-box">
+                    <strong>⚠️ Owldra Alert:</strong> Owldra confirmed 2 new images resembling your face across social platforms. We recommend verifying ownership and copyright status. Unauthorized use of your likeness may require DMCA takedown or direct contact with platform administrators.
+                </div>
+                <a href="#" class="cta-button">→ Verify Image Ownership</a>
+            </div>
+
+            <!-- Breach & Dark Web Watch -->
+            <div class="section">
+                <h2>Breach & Dark Web Watch</h2>
+                <div class="finding-item" style="border: 2px solid #fc8181; background: #fff5f5;">
+                    <div class="finding-icon icon-breach">⚠️</div>
+                    <div class="finding-content">
+                        <div class="finding-title">Recent Breach Match Detected</div>
+                        <div class="finding-description">
+                            <strong>Email:</strong> janedoe@gmail.com<br>
+                            <strong>Source:</strong> 2024 Social App Leak (October 2025)<br>
+                            <strong>Exposed Data:</strong> Email address, hashed password, account creation date, profile information
+                        </div>
+                    </div>
+                </div>
+                <div class="recommendation-box" style="margin-top: 20px;">
+                    <strong>🦉 Owldra Recommendation:</strong> Change passwords immediately for any accounts using the same credentials. Enable two-factor authentication (2FA) on all important accounts. Consider using a password manager to generate unique passwords for each service. Monitor your accounts for suspicious activity over the next 30 days.
+                </div>
+                <a href="#" class="cta-button">→ View Security Guide</a>
+            </div>
+
+            <!-- Weekly Timeline Insight -->
+            <div class="section">
+                <h2>Weekly Timeline Insight</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-day">Monday, October 20</div>
+                        <div class="timeline-event">Scan initiated — No new mentions detected</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-day">Tuesday, October 21</div>
+                        <div class="timeline-event">3 new public mentions found across Reddit and Medium</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-day">Wednesday, October 22</div>
+                        <div class="timeline-event">2 face matches detected on Pinterest and Instagram</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-day">Thursday, October 23</div>
+                        <div class="timeline-event">Breach database updated — 1 new match found</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-day">Friday, October 24</div>
+                        <div class="timeline-event">1 new data broker alert added to monitoring list</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Risk Summary -->
+            <div class="section">
+                <h2>AI Risk Summary</h2>
+                <div class="ai-summary">
+                    Owldra analyzed <strong>18 new signals</strong> this week across all monitoring categories. Of these, <strong>2 pose high risk</strong> (face match without attribution, data breach), <strong>3 pose moderate risk</strong> (public mentions with contact info), and <strong>13 pose low risk</strong> (standard social media activity). You've reduced total exposure by <strong>10% since your last scan</strong> through proactive broker removals.
+                </div>
+                <div class="risk-chart">
+                    <div class="risk-bar">
+                        <div class="risk-bar-label">
+                            <span><strong>High Risk</strong></span>
+                            <span>2 signals</span>
+                        </div>
+                        <div class="risk-bar-track">
+                            <div class="risk-bar-fill bar-high" style="width: 11%;"></div>
+                        </div>
+                    </div>
+                    <div class="risk-bar">
+                        <div class="risk-bar-label">
+                            <span><strong>Moderate Risk</strong></span>
+                            <span>3 signals</span>
+                        </div>
+                        <div class="risk-bar-track">
+                            <div class="risk-bar-fill bar-moderate" style="width: 17%;"></div>
+                        </div>
+                    </div>
+                    <div class="risk-bar">
+                        <div class="risk-bar-label">
+                            <span><strong>Low Risk</strong></span>
+                            <span>13 signals</span>
+                        </div>
+                        <div class="risk-bar-track">
+                            <div class="risk-bar-fill bar-low" style="width: 72%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggested Actions -->
+            <div class="section">
+                <h2>Suggested Actions</h2>
+                <ul class="action-list">
+                    <li class="action-item">✓ Confirm new photo matches on Pinterest and Instagram — verify if usage is authorized</li>
+                    <li class="action-item">✓ Initiate broker removals for Spokeo, TruthFinder, and Whitepages listings</li>
+                    <li class="action-item">✓ Update passwords for all accounts associated with janedoe@gmail.com</li>
+                    <li class="action-item">✓ Review public mentions for accuracy — request corrections if information is outdated</li>
+                    <li class="action-item">✓ Enable two-factor authentication on high-priority accounts</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-cta">
+                <a href="#" class="cta-button">View My Full Dashboard →</a>
+            </div>
+            <div class="footer-text">
+                <strong>Protected by The Three Wise Owls of Owldra</strong><br>
+                Owlex Hears • Owlex Sees • Owlex Speaks<br><br>
+                Your personal digital watch-owl that's always smart, friendly, and awake to protect your name, face, and online identity.<br><br>
+                Questions? Visit <a href="https://www.owldra.com" style="color: #1e88e5; text-decoration: none; font-weight: 600;">www.owldra.com</a> or reply to this email.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
